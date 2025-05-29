@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Clothes Shop ERP{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card savings">
+        <div class="stat-label">Tabungan</div>
+        <div class="stat-value">IDR {{ total_savings|floatformat:0 }}</div>
+    </div>
+    <div class="stat-card expenses">
+        <div class="stat-label">Total Pengeluaran</div>
+        <div class="stat-value">IDR {{ total_expenses|floatformat:0 }}</div>
+    </div>
+    <div class="stat-card investment">
+        <div class="stat-label">Total Investasi</div>
+        <div class="stat-value">IDR {{ total_investment|floatformat:0 }}</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+    <div class="card">
+        <h3 style="margin-bottom: 20px;">Histori Transaksi</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Penerima</th>
+                        <th>Tipe</th>
+                        <th>Tanggal</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in recent_sales %}
+                    <tr>
+                        <td>{{ sale.customer.name }}</td>
+                        <td>Shopping</td>
+                        <td>{{ sale.sale_date|date:"d M Y" }}</td>
+                        <td>${{ sale.total_amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; opacity: 0.7;">No transactions yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom: 20px;">Pembayaran & Biaya</h3>
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div>
+                    <div style="font-size: 12px; opacity: 0.8;">Current balance</div>
+                    <div style="font-size: 24px; font-weight: bold;">Rp {{ total_savings|floatformat:0 }}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 12px; opacity: 0.8;">Income</div>
+                    <div style="font-size: 18px; color: #4caf50;">Rp 0</div>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 12px; opacity: 0.8;">Outcome</div>
+                <div style="font-size: 18px; color: #f44336;">Rp {{ total_expenses|floatformat:0 }}</div>
+            </div>
+            <div style="margin-top: 15px; font-size: 12px; opacity: 0.8;">
+                5789 •••• •••• 2847
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h4 style="margin-bottom: 15px;">Select Currency</h4>
+            <div style="display: flex; gap: 10px;">
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; text-align: center; flex: 1;">
+                    <div style="font-size: 12px;">$</div>
+                    <div style="font-size: 10px;">USD</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; text-align: center; flex: 1;">
+                    <div style="font-size: 12px;">Rp</div>
+                    <div style="font-size: 10px;">IDR</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; text-align: center; flex: 1;">
+                    <div style="font-size: 12px;">£</div>
+                    <div style="font-size: 10px;">GBP</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 20px;">
+    <h3 style="margin-bottom: 20px;">Total Distributions</h3>
+    <div style="display: flex; align-items: center; gap: 30px;">
+        <div style="flex: 1;">
+            <canvas id="distributionChart" width="400" height="200"></canvas>
+        </div>
+        <div style="flex: 1;">
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <div style="width: 20px; height: 20px; background: #ffd700; border-radius: 3px;"></div>
+                    <span>Shopping</span>
+                    <span style="margin-left: auto; font-weight: bold;">52%</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px;">
+                    <div style="background: #ffd700; height: 100%; width: 52%; border-radius: 4px;"></div>
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <div style="width: 20px; height: 20px; background: #4caf50; border-radius: 3px;"></div>
+                    <span>Electronics</span>
+                    <span style="margin-left: auto; font-weight: bold;">21%</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px;">
+                    <div style="background: #4caf50; height: 100%; width: 21%; border-radius: 4px;"></div>
+                </div>
+            </div>
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <div style="width: 20px; height: 20px; background: #2196f3; border-radius: 3px;"></div>
+                    <span>Travels</span>
+                    <span style="margin-left: auto; font-weight: bold;">74%</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px;">
+                    <div style="background: #2196f3; height: 100%; width: 74%; border-radius: 4px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Chart for distributions
+const ctx = document.getElementById('distributionChart').getContext('2d');
+const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+            label: 'Sales',
+            data: [300, 250, 400, 350, 500, 450, 400],
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(255,255,255,0.1)'
+                },
+                ticks: {
+                    color: 'rgba(255,255,255,0.8)'
+                }
+            },
+            x: {
+                grid: {
+                    color: 'rgba(255,255,255,0.1)'
+                },
+                ticks: {
+                    color: 'rgba(255,255,255,0.8)'
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

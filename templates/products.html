@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Products - Clothes Shop ERP{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+    <h2>Data Master - Products</h2>
+    <button class="btn btn-primary" onclick="toggleAddForm()">
+        <i class="fas fa-plus"></i> Add New Product
+    </button>
+</div>
+
+<div id="addProductForm" style="display: none;" class="card">
+    <h3>Add New Product</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="name">Product Name</label>
+                <input type="text" id="name" name="name" placeholder="e.g., Cotton T-Shirt" required>
+            </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                    <option value="">Select Category</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="size">Size</label>
+                <select id="size" name="size" required>
+                    <option value="">Select Size</option>
+                    <option value="XS">Extra Small (XS)</option>
+                    <option value="S">Small (S)</option>
+                    <option value="M">Medium (M)</option>
+                    <option value="L">Large (L)</option>
+                    <option value="XL">Extra Large (XL)</option>
+                    <option value="XXL">Double Extra Large (XXL)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="color">Color</label>
+                <input type="text" id="color" name="color" placeholder="e.g., Red, Blue, Black" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Selling Price</label>
+                <input type="number" id="price" name="price" step="0.01" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+                <label for="cost_price">Cost Price</label>
+                <input type="number" id="cost_price" name="cost_price" step="0.01" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+                <label for="stock_quantity">Stock Quantity</label>
+                <input type="number" id="stock_quantity" name="stock_quantity" placeholder="0" required>
+            </div>
+            <div class="form-group">
+                <label for="sku">SKU</label>
+                <input type="text" id="sku" name="sku" placeholder="e.g., TSH-001-M-RED" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="3" placeholder="Product description..."></textarea>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-success">Save Product</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleAddForm()">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Size</th>
+                <th>Color</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>SKU</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.category.name }}</td>
+                <td>{{ product.size }}</td>
+                <td>{{ product.color }}</td>
+                <td>${{ product.price }}</td>
+                <td>
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; 
+                        {% if product.stock_quantity < 10 %}background: rgba(244, 67, 54, 0.2); color: #f44336;
+                        {% elif product.stock_quantity < 50 %}background: rgba(255, 152, 0, 0.2); color: #ff9800;
+                        {% else %}background: rgba(76, 175, 80, 0.2); color: #4caf50;{% endif %}">
+                        {{ product.stock_quantity }}
+                    </span>
+                </td>
+                <td>{{ product.sku }}</td>
+                <td>
+                    <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">Edit</button>
+                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">Delete</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align: center; opacity: 0.7;">No products found. Add your first product!</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function toggleAddForm() {
+    const form = document.getElementById('addProductForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales - Clothes Shop ERP{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>Transaksi - Sales</h2>
+    <button class="btn btn-primary" onclick="toggleAddForm()">
+        <i class="fas fa-plus"></i> New Sale
+    </button>
+</div>
+
+<div id="addSaleForm" style="display: none;" class="card">
+    <h3>Create New Sale</h3>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="customer">Customer</label>
+                <select id="customer" name="customer" required>
+                    <option value="">Select Customer</option>
+                    {% for customer in customers %}
+                    <option value="{{ customer.id }}">{{ customer.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="payment_method">Payment Method</label>
+                <select id="payment_method" name="payment_method" required>
+                    <option value="">Select Payment Method</option>
+                    <option value="cash">Cash</option>
+                    <option value="card">Credit Card</option>
+                    <option value="transfer">Bank Transfer</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Products</label>
+            <div id="productRows">
+                <div class="product-row" style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: end;">
+                    <div>
+                        <select name="products" required>
+                            <option value="">Select Product</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }} - {{ product.size }} - {{ product.color }} (Stock: {{ product.stock_quantity }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <input type="number" name="quantities" placeholder="Qty" min="1" required>
+                    </div>
+                    <button type="button" class="btn btn-danger" onclick="removeProductRow(this)" style="padding: 8px;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="addProductRow()">
+                <i class="fas fa-plus"></i> Add Product
+            </button>
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="Sale notes..."></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-success">Create Sale</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleAddForm()">Cancel</button>
+        </div>
+    </form>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Sale ID</th>
+                <th>Customer</th>
+                <th>Total Amount</th>
+                <th>Payment Method</th>
+                <th>Sale Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}
+            <tr>
+                <td>#{{ sale.id }}</td>
+                <td>{{ sale.customer.name }}</td>
+                <td>${{ sale.total_amount }}</td>
+                <td>
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; background: rgba(76, 175, 80, 0.2); color: #4caf50;">
+                        {{ sale.get_payment_method_display }}
+                    </span>
+                </td>
+                <td>{{ sale.sale_date|date:"M d, Y H:i" }}</td>
+                <td>
+                    <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;">View</button>
+                    <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Print</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; opacity: 0.7;">No sales found. Create your first sale!</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function toggleAddForm() {
+    const form = document.getElementById('addSaleForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function addProductRow() {
+    const productRows = document.getElementById('productRows');
+    const newRow = document.querySelector('.product-row').cloneNode(true);
+    
+    // Clear the values
+    newRow.querySelectorAll('select, input').forEach(input => {
+        input.value = '';
+    });
+    
+    productRows.appendChild(newRow);
+}
+
+function removeProductRow(button) {
+    const productRows = document.getElementById('productRows');
+    if (productRows.children.length > 1) {
+        button.closest('.product-row').remove();
+    }
+}
+</script>
+{% endblock %}
